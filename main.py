@@ -1,67 +1,80 @@
-import pyttsx3  
-import speech_recognition as sr  
-import datetime  
-import os
-import wikipedia  
+import pyttsx3
+import speech_recognition as sr
+import datetime
+import wikipedia
+import subprocess
+import pywhatkit 
 
-engine = pyttsx3.init() 
 
+# 🔊 Setup voice engine
+engine = pyttsx3.init()
 
 def speak(text):
-    engine.say(text)       
-    engine.runAndWait() 
+    print(text)
+    engine.say(text)
+    engine.runAndWait()
 
-speak("Hello, how are you?")
-
-
-
+# 🎤 Take command from mic
 def take_command():
-    r = sr.Recognizer()  
+    r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
-        r.pause_threshold = 1  
-        audio = r.listen(source)  
+        r.pause_threshold = 1
+        audio = r.listen(source)
 
     try:
         print("Recognizing...")
-        query = r.recognize_google(audio, language='en-in')  # audio → text
-        print(f"You said: {query}\n")
+        query = r.recognize_google(audio, language='en-in')
+        print(query)
+        return query.lower()
 
     except Exception as e:
-        print("Say that again please...")
-        return "None"
-
-    return query
-
+        print("Couldn't recognize:", e)
+        speak("Sorry, I didn't catch that. Please say again.")
+        return "none"
 
 
 
 
-
-
+# start
 speak("Hello, I am Jarvis. How can I help you?")
-query = take_command()  # user ka command suno
+query = take_command()
 
-if 'wikipedia' in query.lower():
-    speak('Searching Wikipedia...')
+
+
+if 'wikipedia' in query:
+    speak("Searching Wikipedia...")
     try:
         result = wikipedia.summary(query.replace("wikipedia", ""), sentences=2)
         speak(result)
     except Exception as e:
-        print("[ERROR] Wikipedia lookup failed:", e)
-        speak("Sorry, I couldn't find that on Wikipedia.")
-
+        print(" Wikipedia failed:", e)
+        speak("Sorry, I couldn't find anything.")
 
 elif 'open youtube' in query:
     speak("Opening YouTube")
-    os.system('start "" "https://youtube.com"')
+    try:
+        subprocess.Popen(["cmd", "/c", "start", "https://youtube.com"])
+    except Exception as e:
+        print(" Could not open YouTube:", e)
+        speak("I tried, but I couldn’t open YouTube.")
 
 elif 'time' in query:
     time = datetime.datetime.now().strftime("%H:%M")
     speak(f"The time is {time}")
 
+# elif 'play' in query and 'youtube' in query:
+#     song = query.replace("play", "").replace("on youtube", "").strip()
+#     speak(f"Playing {song} on YouTube")
+#     try:
+#         pywhatkit.playonyt(song)
+#     except Exception as e:
+#         speak("Sorry, I couldn't play that song.")
+#         print("[ERROR] YouTube playback failed:", e)
+
 else:
+    print(f"[No match] Query was: {query}")
     speak("Sorry, I didn't understand that.")
 
 
- 
+   
