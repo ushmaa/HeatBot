@@ -5,10 +5,37 @@ import wikipedia
 import subprocess
 import pywhatkit 
 import time
+import datetime
 
 
-# 🔊 Setup voice engine
+# Setup voice engine
 engine = pyttsx3.init()
+
+
+def read_notes():
+    file_name = "notes.txt"
+    try:
+        with open(file_name, "r") as file:
+            notes = file.readlines()
+            if notes:
+                speak("Here are your notes:")
+                for line in notes:
+                    speak(line.strip())
+            else:
+                speak("Your notes file is empty.")
+    except FileNotFoundError:
+        speak("I couldn’t find any saved notes yet.")
+
+
+  
+
+def save_note(note_text):
+    time_stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    file_name = "notes.txt"
+    with open(file_name, "a") as file:
+        file.write(f"[{time_stamp}] {note_text}\n")
+    speak("Note saved successfully.")
+
 
 def speak(text):
     print(text)
@@ -83,6 +110,20 @@ while True:
         except Exception as e:
             speak("Sorry, I couldn't play that song.")
             print("[ERROR] YouTube playback failed:", e)
+
+    elif 'note' in query or 'remember' in query:
+        speak("What should I write down?")
+        note = take_command()
+        if note != "none":
+           save_note(note)
+        else:
+           speak("I didn’t catch that. Note not saved.")
+
+
+    elif 'read' in query or 'show notes' in query or 'what did i tell you' in query:
+        read_notes()
+      
+        
 
     else:
         print(f"[No match] Query was: {query}")
