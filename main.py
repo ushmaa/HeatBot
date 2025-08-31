@@ -68,7 +68,7 @@ def take_command():
 
 
 # start
-speak("Hello, I am Jarvis. How can I help you?")
+speak("Hello, I am Heatbot. How can I help you?")
 
 
 while True:
